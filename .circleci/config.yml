@@ -186,7 +186,7 @@ gn-build-steps: &gn-build-steps
           echo 'export SCCACHE_WRAPPER="'"$SCCACHE_PATH"'"' >> $BASH_ENV
           echo 'export CHROMIUM_BUILDTOOLS_PATH="'"$PWD"'/buildtools"' >> $BASH_ENV
           source $BASH_ENV
-          gn gen out/Default --args='import("'$GN_CONFIG'") cc_wrapper="'$SCCACHE_PATH'" '$GN_EXTRA_ARGS'
+          gn gen out/Default --args='import("'$GN_CONFIG'") cc_wrapper="'$SCCACHE_PATH'"' $GN_EXTRA_ARGS
     - run:
         name: Ninja build
         command: |
@@ -197,7 +197,7 @@ gn-build-steps: &gn-build-steps
         command: |
           if [ "$BUILD_FFMPEG" == "true" ]; then
             cd src
-            gn gen out/ffmpeg --args='import("//electron/build/args/ffmpeg.gn") cc_wrapper="'$SCCACHE_PATH'" '$GN_EXTRA_ARGS'
+            gn gen out/ffmpeg --args='import("//electron/build/args/ffmpeg.gn") cc_wrapper="'$SCCACHE_PATH'"' $GN_EXTRA_ARGS
           fi
     - run:
         name: Non proprietary ffmpeg build
@@ -211,7 +211,7 @@ gn-build-steps: &gn-build-steps
         command: |
           if [ "$BUILD_NATIVE_MKSNAPSHOT" == "true" ]; then
             cd src
-            gn gen out/native_mksnapshot --args='import("//electron/build/args/native_mksnapshot.gn") cc_wrapper="'$SCCACHE_PATH'" '$GN_EXTRA_ARGS' v8_snapshot_toolchain="'$MKSNAPSHOT_TOOLCHAIN'"'
+            gn gen out/native_mksnapshot --args='import("//electron/build/args/native_mksnapshot.gn") cc_wrapper="'$SCCACHE_PATH'" v8_snapshot_toolchain="'$MKSNAPSHOT_TOOLCHAIN'"' $GN_EXTRA_ARGS
           fi
     - run:
         name: native mksnapshot (arm/arm64) build
