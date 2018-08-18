@@ -12,7 +12,7 @@ from lib.config import BASE_URL, PLATFORM, MIPS64EL_SYSROOT_URL, \
                        is_verbose_mode, get_target_arch
 from lib.util import execute, execute_stdout, get_electron_version, \
                      scoped_cwd, download, update_node_modules
-
+from tls import check_tls
 
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 VENDOR_DIR = os.path.join(SOURCE_ROOT, 'vendor')
@@ -31,6 +31,8 @@ def main():
   if sys.platform == 'cygwin':
     update_win32_python()
 
+  check_tls(args.verbose)
+
   update_submodules()
 
   libcc_source_path = args.libcc_source_path
@@ -45,7 +47,7 @@ def main():
 
   # Redirect to use local libchromiumcontent build.
   if args.build_release_libcc or args.build_debug_libcc:
-    build_libchromiumcontent(args.verbose, args.target_arch, defines,
+    build_libchromiumcontent(args.verbose, args.target_arch,
                              args.build_debug_libcc, args.update_libcc)
     dist_dir = os.path.join(VENDOR_DIR, 'libchromiumcontent', 'dist', 'main')
     libcc_source_path = os.path.join(dist_dir, 'src')
@@ -167,6 +169,8 @@ def setup_libchromiumcontent(is_dev, target_arch, url,
     mkdir_p(target_dir)
   else:
     mkdir_p(DOWNLOAD_DIR)
+  if is_verbose_mode():
+    args += ['-v']
   if is_dev:
     subprocess.check_call([sys.executable, script] + args)
   else:
@@ -179,7 +183,7 @@ def update_win32_python():
       execute_stdout(['git', 'clone', PYTHON_26_URL])
 
 
-def build_libchromiumcontent(verbose, target_arch, defines, debug,
+def build_libchromiumcontent(verbose, target_arch, debug,
                              force_update):
   args = [sys.executable,
           os.path.join(SOURCE_ROOT, 'script', 'build-libchromiumcontent.py')]
@@ -189,8 +193,6 @@ def build_libchromiumcontent(verbose, target_arch, defines, debug,
     args += ['--force-update']
   if verbose:
     args += ['-v']
-  if defines:
-    args += ['--defines', defines]
   execute_stdout(args + ['--target_arch', target_arch])
 
 
